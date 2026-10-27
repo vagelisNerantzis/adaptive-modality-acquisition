@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Python 3.12 / CPU
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+      - name: Install project and development dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Compile package, tests and example
+        run: python -m compileall src tests examples
+      - name: Run synthetic test suite
+        run: pytest -q
+      - name: Run synthetic acquisition demo
+        run: python examples/synthetic_acquisition_demo.py
+      - name: Verify package version
+        shell: python
+        run: |
+          import importlib.metadata
+          import pathlib
+          import tomllib
+          import adaptive_acquisition
+
+          project = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+          assert project["project"]["version"] == adaptive_acquisition.__version__ == importlib.metadata.version("adaptive-modality-acquisition") == "0.1.0"
+          print("Package, project and distribution version: 0.1.0")

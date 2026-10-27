@@ -1,0 +1,17 @@
+# Illustrative only; no YAML runtime dependency is required.
+seed: 42  # reserved for an external synthetic forecast generator
+cost_weight: 0.15
+confidence_threshold: 0.90
+budget: 10.0
+
+modalities:
+  macro:
+    cost: 1.0
+  spectral:
+    cost: 2.0
+  microscopy_low:
+    cost: 3.0
+  microscopy_high:
+    cost: 6.0
+
+# Initial evidence and any incurred initial cost must be supplied explicitly.
